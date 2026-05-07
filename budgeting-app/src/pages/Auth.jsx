@@ -4,20 +4,21 @@ import { useApp } from '../context/AppContext';
 import { IconWallet } from '../components/Icons';
 
 export default function Auth() {
-  const { login, register, isOnboarded } = useApp();
+  const { login, beginRegistration, authError } = useApp();
   const navigate = useNavigate();
   const [tab, setTab] = useState('login');
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const validateLogin = () => {
     const e = {};
     if (!form.email.includes('@')) e.email = 'Enter a valid email';
-    if (form.password.length < 4) e.password = 'Password too short';
+    if (form.password.length < 1) e.password = 'Password is required';
     return e;
-  };
+  }; 
 
   const validateRegister = () => {
     const e = {};
@@ -28,16 +29,20 @@ export default function Auth() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = tab === 'login' ? validateLogin() : validateRegister();
     if (Object.keys(errs).length) { setErrors(errs); return; }
+
     if (tab === 'login') {
-      login({ email: form.email, password: form.password });
+      setSubmitting(true);
+      const ok = await login({ email: form.email, password: form.password });
+      setSubmitting(false);
+      if (ok) navigate('/dashboard');
     } else {
-      register({ name: form.name, email: form.email });
+      beginRegistration({ name: form.name, email: form.email, password: form.password });
+      navigate('/onboarding');
     }
-    navigate('/dashboard');
   };
 
   return (
@@ -118,18 +123,18 @@ export default function Auth() {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary btn-full" style={{ marginTop: 8 }}>
-            {tab === 'login' ? 'Log in' : 'Create account'}
+          {authError && <p className="field-error" style={{ textAlign: 'center' }}>{authError}</p>}
+
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            style={{ marginTop: 8 }}
+            disabled={submitting}
+          >
+            {submitting ? 'Please wait…' : tab === 'login' ? 'Log in' : 'Continue'}
           </button>
         </form>
 
-        {!isOnboarded && (
-          <p className="auth-back">
-            <button className="link-btn" onClick={() => navigate('/')}>
-              ← Back to onboarding
-            </button>
-          </p>
-        )}
       </div>
     </div>
   );

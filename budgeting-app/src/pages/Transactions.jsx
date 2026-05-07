@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES, getCategoryById } from '../data/mockData';
+import { CATEGORIES, getCategoryById } from '../data/categories';
 import { IconTrash, IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
 
 const fmt = (n) =>
@@ -40,7 +40,6 @@ export default function Transactions() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="filters-bar">
         <div className="filter-group">
           <span className="filter-label">Type</span>
@@ -81,7 +80,6 @@ export default function Transactions() {
         )}
       </div>
 
-      {/* Summary row */}
       <div className="tx-summary">
         {typeFilter !== 'expense' && (
           <div className="tx-summary-item tx-summary-item--income">
@@ -97,7 +95,6 @@ export default function Transactions() {
         )}
       </div>
 
-      {/* Transactions list */}
       <div className="card">
         {filtered.length === 0 ? (
           <div className="empty-state">
@@ -135,9 +132,7 @@ export default function Transactions() {
                       </span>
                     </span>
                   </div>
-                  <span
-                    className={`tx-amount ${tx.type === 'income' ? 'tx-amount--income' : 'tx-amount--expense'}`}
-                  >
+                  <span className={`tx-amount ${tx.type === 'income' ? 'tx-amount--income' : 'tx-amount--expense'}`}>
                     {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                   </span>
                   <button

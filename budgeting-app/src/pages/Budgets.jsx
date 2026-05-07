@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES } from '../data/mockData';
+import { CATEGORIES } from '../data/categories';
 import { IconEdit, IconCheck, IconClose } from '../components/Icons';
 
 const fmt = (n) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 
-const CURRENT_MONTH = '2026-05';
-
 function getMonthKey(dateStr) {
   return dateStr.slice(0, 7);
 }
+
+const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
 function EditableLimit({ limit, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -51,16 +51,15 @@ function EditableLimit({ limit, onSave }) {
 
 export default function Budgets() {
   const { transactions, budgets, updateBudget } = useApp();
+  const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
 
   const spentByCategory = useMemo(() => {
     const map = {};
     transactions
       .filter((t) => t.type === 'expense' && getMonthKey(t.date) === CURRENT_MONTH)
-      .forEach((t) => {
-        map[t.category] = (map[t.category] || 0) + t.amount;
-      });
+      .forEach((t) => { map[t.category] = (map[t.category] || 0) + t.amount; });
     return map;
-  }, [transactions]);
+  }, [transactions, CURRENT_MONTH]);
 
   const totalBudget = CATEGORIES.reduce((s, c) => s + (budgets[c.id] || 0), 0);
   const totalSpent = Object.values(spentByCategory).reduce((s, v) => s + v, 0);
@@ -71,11 +70,10 @@ export default function Budgets() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Budgets</h1>
-          <p className="page-sub">May 2026 · click a limit to edit</p>
+          <p className="page-sub">{currentMonthDisplay} · click a limit to edit</p>
         </div>
       </div>
 
-      {/* Overall */}
       <div className="card budget-overview">
         <div className="budget-overview-row">
           <div>
@@ -98,7 +96,6 @@ export default function Budgets() {
         </span>
       </div>
 
-      {/* Per-category cards */}
       <div className="budgets-grid">
         {CATEGORIES.map((cat) => {
           const spent = spentByCategory[cat.id] || 0;

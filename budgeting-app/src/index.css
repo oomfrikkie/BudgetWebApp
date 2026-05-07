@@ -319,6 +319,10 @@ input, select { font-family: inherit; }
   flex-direction: column;
   gap: 4px;
 }
+.stat-card--highlight {
+  background: var(--bg-3);
+  border-color: var(--border-2, rgba(255,255,255,0.13));
+}
 
 .stat-label {
   font-size: 0.75rem;
@@ -1267,4 +1271,248 @@ input, select { font-family: inherit; }
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.6);
   cursor: pointer;
+}
+
+/* ── Income breakdown card ───────────────────────────────── */
+.income-breakdown { margin-bottom: 0; }
+
+.income-breakdown-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .income-breakdown-body { grid-template-columns: 1fr; }
+}
+
+.income-schedule-rows { display: flex; flex-direction: column; gap: 8px; }
+
+.income-row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+}
+.income-row--total {
+  grid-template-columns: 1fr auto;
+  font-weight: 600;
+  padding-top: 4px;
+}
+.income-row-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.income-row-dot--received { background: var(--green); }
+.income-row-dot--upcoming { background: var(--border-2, rgba(255,255,255,0.15)); }
+.income-row--upcoming .income-row-label,
+.income-row--upcoming .income-row-amount { opacity: 0.55; }
+.income-row-day { font-size: 0.78rem; white-space: nowrap; }
+.income-row-amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.income-divider { height: 1px; background: var(--border-1); margin: 4px 0; }
+
+.income-remaining-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 160px;
+}
+.remaining-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+}
+.remaining-card--projected { border-style: dashed; }
+.remaining-label { font-size: 0.75rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.remaining-value { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.remaining-value--pos { color: var(--green); }
+.remaining-value--neg { color: var(--red, #ef4444); }
+.remaining-hint { font-size: 0.72rem; color: var(--text-2); }
+
+/* ── Income schedule manager (Settings) ──────────────────── */
+.schedule-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.schedule-row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-0);
+}
+.schedule-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.schedule-amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.schedule-day { font-size: 0.78rem; white-space: nowrap; }
+.schedule-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-1);
+  margin-top: 4px;
+}
+.schedule-add-row-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Full-page loading spinner */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: var(--text-2);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── Onboarding budget step ──────────────────────────────── */
+.onboarding-budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.onboarding-budget-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-0);
+}
+
+.onboarding-budget-cat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-0);
+}
+
+/* ── Onboarding actions / skip ───────────────────────────── */
+.onboarding-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.onboarding-skip {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color var(--transition);
+}
+
+.onboarding-skip:hover { color: var(--text-1); }
+
+/* ── Onboarding summary (step 4) ─────────────────────────── */
+.onboarding-summary {
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.summary-label { color: var(--text-1); }
+
+.summary-value {
+  font-weight: 600;
+  color: var(--text-0);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Ghost button ─────────────────────────────────────────── */
+.btn-ghost {
+  background: var(--bg-3);
+  color: var(--text-1);
+  border: 1px solid var(--border-1);
+}
+.btn-ghost:hover { background: var(--bg-4); color: var(--text-0); }
+
+/* ── What if modal ───────────────────────────────────────── */
+.whatif-impact {
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.whatif-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.whatif-row--diff { opacity: 0.75; }
+
+.whatif-label { color: var(--text-1); }
+
+.whatif-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.whatif-value--lg { font-size: 1.15rem; }
+
+.whatif-divider { height: 1px; background: var(--border-1); }
+
+.whatif-budget {
+  background: var(--bg-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whatif-budget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.whatif-budget-cat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.whatif-over {
+  font-size: 0.78rem;
+  color: var(--red, #ef4444);
+  margin: 0;
 }

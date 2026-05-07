@@ -9,23 +9,47 @@ import Transactions from './pages/Transactions';
 import Budgets from './pages/Budgets';
 import Settings from './pages/Settings';
 
+function ProtectedRoute({ children }) {
+  const { token, loading } = useApp();
+  if (loading) return <div className="page-loading">Loading…</div>;
+  if (!token) return <Navigate to="/auth" replace />;
+  return children;
+}
+
 function AppRoutes() {
-  const { showAddModal } = useApp();
+  const { token, loading, showAddModal } = useApp();
+
+  if (loading) return <div className="page-loading">Loading…</div>;
 
   return (
     <>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/transactions" element={<Layout><Transactions /></Layout>} />
-        <Route path="/budgets" element={<Layout><Budgets /></Layout>} />
-        <Route path="/settings" element={<Layout><Settings /></Layout>} />
+        <Route
+          path="/auth"
+          element={token ? <Navigate to="/dashboard" replace /> : <Auth />}
+        />
+        <Route
+          path="/dashboard"
+          element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>}
+        />
+        <Route
+          path="/transactions"
+          element={<ProtectedRoute><Layout><Transactions /></Layout></ProtectedRoute>}
+        />
+        <Route
+          path="/budgets"
+          element={<ProtectedRoute><Layout><Budgets /></Layout></ProtectedRoute>}
+        />
+        <Route
+          path="/settings"
+          element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>}
+        />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
 
-      {showAddModal && <AddTransactionModal />}
+      {showAddModal && <ProtectedRoute><AddTransactionModal /></ProtectedRoute>}
     </>
   );
 }

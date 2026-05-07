@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES } from '../data/mockData';
+import { CATEGORIES } from '../data/categories';
 import { IconClose, IconArrowUp, IconArrowDown } from './Icons';
 
 const today = new Date().toISOString().split('T')[0];
@@ -13,29 +13,36 @@ export default function AddTransactionModal() {
   const [category, setCategory] = useState('grocery');
   const [date, setDate] = useState(today);
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const validate = () => {
     const e = {};
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0)
       e.amount = 'Enter a valid amount';
     if (!description.trim()) e.description = 'Description is required';
-    if (type === 'income' && !date) e.date = 'Date is required for income';
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
-    addTransaction({
-      type,
-      amount: parseFloat(amount),
-      description: description.trim(),
-      category: type === 'expense' ? category : undefined,
-      date: date || today,
-    });
-    closeAddModal();
+    setSubmitting(true);
+    try {
+      await addTransaction({
+        type,
+        amount: parseFloat(amount),
+        description: description.trim(),
+        category: type === 'expense' ? category : undefined,
+        date: date || today,
+      });
+      closeAddModal();
+    } catch {
+      setErrors({ submit: 'Failed to save transaction. Please try again.' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -48,7 +55,6 @@ export default function AddTransactionModal() {
           </button>
         </div>
 
-        {/* Type toggle */}
         <div className="type-toggle">
           <button
             type="button"
@@ -69,7 +75,6 @@ export default function AddTransactionModal() {
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Amount */}
           <div className="form-field">
             <label className="form-label">Amount</label>
             <div className="input-prefix-wrap">
@@ -87,7 +92,6 @@ export default function AddTransactionModal() {
             {errors.amount && <span className="field-error">{errors.amount}</span>}
           </div>
 
-          {/* Description */}
           <div className="form-field">
             <label className="form-label">Description</label>
             <input
@@ -100,7 +104,6 @@ export default function AddTransactionModal() {
             {errors.description && <span className="field-error">{errors.description}</span>}
           </div>
 
-          {/* Category — expense only */}
           {type === 'expense' && (
             <div className="form-field">
               <label className="form-label">Category</label>
@@ -118,25 +121,24 @@ export default function AddTransactionModal() {
             </div>
           )}
 
-          {/* Date */}
           <div className="form-field">
-            <label className="form-label">
-              Date{type === 'income' ? ' *' : ' (optional)'}
-            </label>
+            <label className="form-label">Date</label>
             <input
-              className={`form-input ${errors.date ? 'input-error' : ''}`}
+              className="form-input"
               type="date"
               value={date}
-              onChange={(e) => { setDate(e.target.value); setErrors((p) => ({ ...p, date: '' })); }}
+              onChange={(e) => setDate(e.target.value)}
             />
-            {errors.date && <span className="field-error">{errors.date}</span>}
           </div>
+
+          {errors.submit && <p className="field-error">{errors.submit}</p>}
 
           <button
             type="submit"
             className={`btn btn-primary btn-full ${type === 'income' ? 'btn-income' : 'btn-expense'}`}
+            disabled={submitting}
           >
-            Add {type === 'income' ? 'Income' : 'Expense'}
+            {submitting ? 'Saving…' : `Add ${type === 'income' ? 'Income' : 'Expense'}`}
           </button>
         </form>
       </div>
