@@ -385,16 +385,24 @@ input, select { font-family: inherit; }
   gap: 8px;
   height: 140px;
   margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
 }
 
 .bar-col {
-  flex: 1;
+  flex: 0 0 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   height: 100%;
   justify-content: flex-end;
+}
+
+.bar-label--future {
+  color: var(--text-3, var(--text-2));
+  opacity: 0.45;
 }
 
 .bar-value {

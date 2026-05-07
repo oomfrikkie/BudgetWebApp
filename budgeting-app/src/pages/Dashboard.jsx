@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, getCategoryById } from '../data/categories';
 import { IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
@@ -11,12 +11,18 @@ const fmtSigned = (n) => `${n >= 0 ? '+' : ''}${fmt(n)}`;
 
 function getMonthKey(dateStr) { return dateStr.slice(0, 7); }
 
-function getLastNMonths(n) {
+function getMonthsRange(startKey, futureMonths = 3) {
   const months = [];
-  const now = new Date();
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  const [sy, sm] = startKey.split('-').map(Number);
+  const end = new Date();
+  end.setMonth(end.getMonth() + futureMonths);
+  const ey = end.getFullYear();
+  const em = end.getMonth() + 1;
+  let y = sy, m = sm;
+  while (y < ey || (y === ey && m <= em)) {
+    months.push(`${y}-${String(m).padStart(2, '0')}`);
+    m++;
+    if (m > 12) { m = 1; y++; }
   }
   return months;
 }
@@ -33,8 +39,9 @@ const ordinal = (n) => {
 const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
 export default function Dashboard() {
-  const { transactions, budgets, settings, incomeSchedules, openAddModal } = useApp();
+  const { transactions, budgets, settings, incomeSchedules, openAddModal, user } = useApp();
   const [showWhatIf, setShowWhatIf] = useState(false);
+  const barChartRef = useRef(null);
 
   const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
   const todayDay = new Date().getDate();
@@ -75,14 +82,28 @@ export default function Dashboard() {
   }, [currentMonthTxs]);
 
   // ── Monthly bar chart ───────────────────────────────────────
-  const last6Months = getLastNMonths(6);
-  const monthlySpend = useMemo(() => last6Months.map((key) => ({
+  const joinMonth = useMemo(() => {
+    if (user?.createdAt) return user.createdAt.slice(0, 7);
+    if (transactions.length > 0)
+      return [...transactions].sort((a, b) => a.date.localeCompare(b.date))[0].date.slice(0, 7);
+    return CURRENT_MONTH;
+  }, [user, transactions, CURRENT_MONTH]);
+
+  const chartMonths = useMemo(() => getMonthsRange(joinMonth, 3), [joinMonth]);
+
+  const monthlySpend = useMemo(() => chartMonths.map((key) => ({
     key,
     total: transactions
       .filter((t) => getMonthKey(t.date) === key && t.type === 'expense')
       .reduce((s, t) => s + t.amount, 0),
-  })), [transactions, last6Months]);
-  const maxSpend = Math.max(...monthlySpend.map((m) => m.total), 1);
+  })), [transactions, chartMonths]);
+  const maxSpend = Math.max(...monthlySpend.filter(m => m.total > 0).map((m) => m.total), 1);
+
+  useEffect(() => {
+    if (!barChartRef.current) return;
+    const current = barChartRef.current.querySelector('.bar-col--current');
+    if (current) current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [chartMonths]);
 
   // ── Recent ──────────────────────────────────────────────────
   const recentTxs = useMemo(
@@ -192,20 +213,21 @@ export default function Dashboard() {
         {/* Monthly bar chart */}
         <div className="card">
           <h2 className="card-title">Monthly spending</h2>
-          <div className="bar-chart">
+          <div className="bar-chart" ref={barChartRef}>
             {monthlySpend.map(({ key, total }) => {
-              const pct = (total / maxSpend) * 100;
               const isCurrent = key === CURRENT_MONTH;
+              const isFuture = key > CURRENT_MONTH;
+              const pct = isFuture ? 0 : (total / maxSpend) * 100;
               return (
-                <div key={key} className="bar-col">
-                  <span className="bar-value">{total > 0 ? fmt(total) : '–'}</span>
+                <div key={key} className={`bar-col ${isCurrent ? 'bar-col--current' : ''}`}>
+                  <span className="bar-value">{!isFuture && total > 0 ? fmt(total) : '–'}</span>
                   <div className="bar-track">
                     <div
-                      className={`bar-fill ${isCurrent ? 'bar-fill--current' : ''}`}
-                      style={{ height: `${Math.max(pct, 2)}%` }}
+                      className={`bar-fill ${isCurrent ? 'bar-fill--current' : ''} ${isFuture ? 'bar-fill--future' : ''}`}
+                      style={{ height: `${isFuture ? 0 : Math.max(pct, total > 0 ? 2 : 0)}%` }}
                     />
                   </div>
-                  <span className={`bar-label ${isCurrent ? 'bar-label--current' : ''}`}>
+                  <span className={`bar-label ${isCurrent ? 'bar-label--current' : ''} ${isFuture ? 'bar-label--future' : ''}`}>
                     {monthLabel(key)}
                   </span>
                 </div>
