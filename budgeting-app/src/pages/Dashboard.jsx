@@ -257,7 +257,7 @@ export default function Dashboard() {
             const cat = tx.type === 'expense' ? getCategoryById(tx.category) : null;
             return (
               <div key={tx.id} className="tx-row">
-                <div className="tx-icon" style={{ background: cat ? cat.color + '22' : 'var(--green-dim)', color: cat ? cat.color : 'var(--green)' }}>
+                <div className="tx-icon" style={tx.type === 'expense' ? { background: 'var(--red-dim)', color: 'var(--red)' } : { background: 'var(--green-dim)', color: 'var(--green)' }}>
                   {cat ? cat.emoji : '↑'}
                 </div>
                 <div className="tx-info">
