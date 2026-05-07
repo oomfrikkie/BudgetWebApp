@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from '../src/app.module';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const express = require('express');
@@ -18,6 +19,14 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type,Authorization',
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Budget App API')
+    .setVersion('1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT')
+    .build();
+  SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConfig));
+
   await app.init();
   isReady = true;
   return server;
