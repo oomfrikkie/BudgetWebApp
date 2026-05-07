@@ -63,6 +63,7 @@ export const api = {
   transactions: {
     list: (userId) => request(`/transactions?userId=${userId}`),
     create: (data) => request('/transactions', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
     remove: (id) => request(`/transactions/${id}`, { method: 'DELETE' }),
   },
 

@@ -143,6 +143,17 @@ export function AppProvider({ children }) {
     setTransactions((prev) => [normalizeTransaction(tx), ...prev]);
   };
 
+  const updateTransaction = async (id, { type, amount, description, category, date }) => {
+    const tx = await api.transactions.update(id, {
+      type,
+      categoryId: category || null,
+      amount,
+      description,
+      date,
+    });
+    setTransactions((prev) => prev.map((t) => t.id === id ? normalizeTransaction(tx) : t));
+  };
+
   const deleteTransaction = async (id) => {
     await api.transactions.remove(id);
     setTransactions((prev) => prev.filter((t) => t.id !== id));
@@ -198,6 +209,7 @@ export function AppProvider({ children }) {
         register,
         logout,
         addTransaction,
+        updateTransaction,
         deleteTransaction,
         updateBudget,
         incomeSchedules,

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, getCategoryById } from '../data/categories';
-import { IconTrash, IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
+import { IconTrash, IconEdit, IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
+import AddTransactionModal from '../components/AddTransactionModal';
 
 const fmt = (n) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
@@ -10,6 +11,7 @@ export default function Transactions() {
   const { transactions, deleteTransaction, openAddModal } = useApp();
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [editTx, setEditTx] = useState(null);
 
   const filtered = useMemo(() => {
     return [...transactions]
@@ -28,6 +30,7 @@ export default function Transactions() {
   );
 
   return (
+    <>
     <div className="page">
       <div className="page-header">
         <div>
@@ -137,6 +140,13 @@ export default function Transactions() {
                     {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                   </span>
                   <button
+                    className="icon-btn"
+                    onClick={() => setEditTx(tx)}
+                    aria-label="Edit"
+                  >
+                    <IconEdit size={16} />
+                  </button>
+                  <button
                     className="icon-btn icon-btn--danger"
                     onClick={() => deleteTransaction(tx.id)}
                     aria-label="Delete"
@@ -150,5 +160,10 @@ export default function Transactions() {
         )}
       </div>
     </div>
+
+    {editTx && (
+      <AddTransactionModal editTx={editTx} onClose={() => setEditTx(null)} />
+    )}
+    </>
   );
 }

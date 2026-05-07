@@ -5,13 +5,16 @@ import { IconClose, IconArrowUp, IconArrowDown } from './Icons';
 
 const today = new Date().toISOString().split('T')[0];
 
-export default function AddTransactionModal() {
-  const { closeAddModal, addTransaction } = useApp();
-  const [type, setType] = useState('expense');
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('grocery');
-  const [date, setDate] = useState(today);
+export default function AddTransactionModal({ editTx, onClose }) {
+  const { closeAddModal, addTransaction, updateTransaction } = useApp();
+  const close = onClose || closeAddModal;
+  const isEdit = !!editTx;
+
+  const [type, setType] = useState(editTx?.type || 'expense');
+  const [amount, setAmount] = useState(editTx ? String(editTx.amount) : '');
+  const [description, setDescription] = useState(editTx?.description || '');
+  const [category, setCategory] = useState(editTx?.category || 'grocery');
+  const [date, setDate] = useState(editTx?.date || today);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,7 +22,6 @@ export default function AddTransactionModal() {
     const e = {};
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0)
       e.amount = 'Enter a valid amount';
-    if (!description.trim()) e.description = 'Description is required';
     return e;
   };
 
@@ -28,16 +30,28 @@ export default function AddTransactionModal() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
+    const desc = description.trim() || (type === 'income' ? 'Income' : 'Expense');
+
     setSubmitting(true);
     try {
-      await addTransaction({
-        type,
-        amount: parseFloat(amount),
-        description: description.trim(),
-        category: type === 'expense' ? category : undefined,
-        date: date || today,
-      });
-      closeAddModal();
+      if (isEdit) {
+        await updateTransaction(editTx.id, {
+          type,
+          amount: parseFloat(amount),
+          description: desc,
+          category: type === 'expense' ? category : undefined,
+          date: date || today,
+        });
+      } else {
+        await addTransaction({
+          type,
+          amount: parseFloat(amount),
+          description: desc,
+          category: type === 'expense' ? category : undefined,
+          date: date || today,
+        });
+      }
+      close();
     } catch {
       setErrors({ submit: 'Failed to save transaction. Please try again.' });
     } finally {
@@ -46,11 +60,11 @@ export default function AddTransactionModal() {
   };
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && closeAddModal()}>
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && close()}>
       <div className="modal">
         <div className="modal-header">
-          <h2 className="modal-title">New Transaction</h2>
-          <button className="icon-btn" onClick={closeAddModal}>
+          <h2 className="modal-title">{isEdit ? 'Edit Transaction' : 'New Transaction'}</h2>
+          <button className="icon-btn" onClick={close}>
             <IconClose size={20} />
           </button>
         </div>
@@ -93,15 +107,14 @@ export default function AddTransactionModal() {
           </div>
 
           <div className="form-field">
-            <label className="form-label">Description</label>
+            <label className="form-label">Description <span style={{ color: 'var(--text-2)', fontWeight: 400 }}>(optional)</span></label>
             <input
-              className={`form-input ${errors.description ? 'input-error' : ''}`}
+              className="form-input"
               type="text"
-              placeholder="e.g. Monthly rent"
+              placeholder={type === 'income' ? 'Income' : 'Expense'}
               value={description}
-              onChange={(e) => { setDescription(e.target.value); setErrors((p) => ({ ...p, description: '' })); }}
+              onChange={(e) => setDescription(e.target.value)}
             />
-            {errors.description && <span className="field-error">{errors.description}</span>}
           </div>
 
           {type === 'expense' && (
@@ -138,7 +151,7 @@ export default function AddTransactionModal() {
             className={`btn btn-primary btn-full ${type === 'income' ? 'btn-income' : 'btn-expense'}`}
             disabled={submitting}
           >
-            {submitting ? 'Saving…' : `Add ${type === 'income' ? 'Income' : 'Expense'}`}
+            {submitting ? 'Saving…' : isEdit ? 'Save Changes' : `Add ${type === 'income' ? 'Income' : 'Expense'}`}
           </button>
         </form>
       </div>
