@@ -108,10 +108,11 @@ export default function Transactions() {
                 <div key={tx.id} className="tx-row">
                   <div
                     className="tx-icon"
-                    style={{
-                      background: cat ? cat.color + '22' : 'var(--green-dim)',
-                      color: cat ? cat.color : 'var(--green)',
-                    }}
+                    style={
+                      tx.type === 'expense'
+                        ? { background: 'var(--red-dim)', color: 'var(--red)' }
+                        : { background: 'var(--green-dim)', color: 'var(--green)' }
+                    }
                   >
                     {cat ? cat.emoji : '↑'}
                   </div>
