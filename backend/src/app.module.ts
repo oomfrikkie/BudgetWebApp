@@ -27,6 +27,7 @@ import { IncomeSchedulesModule } from './modules/income-schedules/income-schedul
         database: config.get('POSTGRES_DB', 'mydb'),
         entities: [User, Category, Transaction, Budget, IncomeSchedule],
         synchronize: false,
+        ssl: { rejectUnauthorized: false },
       }),
     }),
     AuthModule,

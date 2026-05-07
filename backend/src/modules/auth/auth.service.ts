@@ -20,13 +20,14 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.usersRepo.findOneBy({ email: dto.email });
+    const email = dto.email.toLowerCase();
+    const existing = await this.usersRepo.findOneBy({ email });
     if (existing) throw new ConflictException('Email already registered');
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = this.usersRepo.create({
       name: dto.name,
-      email: dto.email,
+      email,
       passwordHash,
       estimatedSalary: dto.estimatedSalary ?? 0,
       hourlyRate: dto.hourlyRate ?? 0,
@@ -37,7 +38,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.usersRepo.findOneBy({ email: dto.email });
+    const user = await this.usersRepo.findOneBy({ email: dto.email.toLowerCase() });
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
