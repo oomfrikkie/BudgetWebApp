@@ -32,8 +32,10 @@ export default function WhatIfModal({ onClose }) {
     [incomeSchedules],
   );
 
+  const currentBalance = totalIncome - totalExpenses;
   const monthEnd = totalIncome + projectedTotal - totalExpenses;
   const sim = parseFloat(amount) || 0;
+  const currentAfterPurchase = currentBalance - sim;
   const afterPurchase = monthEnd - sim;
 
   const catSpent = useMemo(
@@ -92,6 +94,13 @@ export default function WhatIfModal({ onClose }) {
 
           <div className="whatif-impact">
             <div className="whatif-row">
+              <span className="whatif-label">Current balance after purchase</span>
+              <span className={`whatif-value ${currentAfterPurchase >= 0 ? 'text-green' : 'text-red'}`}>
+                {fmt(currentAfterPurchase)}
+              </span>
+            </div>
+            <div className="whatif-divider" />
+            <div className="whatif-row">
               <span className="whatif-label">Month-end now</span>
               <span className={`whatif-value ${monthEnd >= 0 ? 'text-green' : 'text-red'}`}>
                 {fmt(monthEnd)}
@@ -99,7 +108,7 @@ export default function WhatIfModal({ onClose }) {
             </div>
             <div className="whatif-divider" />
             <div className="whatif-row">
-              <span className="whatif-label">After this purchase</span>
+              <span className="whatif-label">Month-end after purchase</span>
               <span className={`whatif-value whatif-value--lg ${afterPurchase >= 0 ? 'text-green' : 'text-red'}`}>
                 {fmt(afterPurchase)}
               </span>
