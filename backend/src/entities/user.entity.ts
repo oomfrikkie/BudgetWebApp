@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { Budget } from './budget.entity';
+import { SavingsGoal } from './savings-goal.entity';
 
 const numericTransformer = {
   to: (v: number) => v,
@@ -48,4 +49,7 @@ export class User {
 
   @OneToMany(() => Budget, (b) => b.user)
   budgets: Budget[];
+
+  @OneToMany(() => SavingsGoal, (g) => g.user)
+  savingsGoals: SavingsGoal[];
 }

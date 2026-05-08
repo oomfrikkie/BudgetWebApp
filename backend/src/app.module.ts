@@ -6,6 +6,7 @@ import { Category } from './entities/category.entity';
 import { Transaction } from './entities/transaction.entity';
 import { Budget } from './entities/budget.entity';
 import { IncomeSchedule } from './entities/income-schedule.entity';
+import { SavingsGoal } from './entities/savings-goal.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -25,7 +26,8 @@ import { IncomeSchedulesModule } from './modules/income-schedules/income-schedul
         username: config.get('POSTGRES_USER', 'admin'),
         password: config.get('POSTGRES_PASSWORD', 'admin'),
         database: config.get('POSTGRES_DB', 'mydb'),
-        entities: [User, Category, Transaction, Budget, IncomeSchedule],
+        entities: [User, Category, Transaction, Budget, IncomeSchedule, SavingsGoal],
+        migrations: ['dist/migrations/*.js'],
         synchronize: false,
         ssl: { rejectUnauthorized: false },
       }),

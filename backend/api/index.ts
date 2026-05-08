@@ -25,7 +25,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT')
     .build();
-  SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConfig));
+  SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, swaggerConfig));
 
   await app.init();
   isReady = true;
