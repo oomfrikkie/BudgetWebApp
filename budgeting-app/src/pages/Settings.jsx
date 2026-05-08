@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { IconLogout, IconCheck, IconTrash, IconPlus } from '../components/Icons';
 
-const fmt = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
 
 function Section({ title, children }) {
   return (
@@ -31,10 +29,7 @@ const ordinal = (n) => {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
-const fmtAmount = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-
-function IncomeScheduleManager() {
+function IncomeScheduleManager({ fmt, currencySymbol }) {
   const { incomeSchedules, addIncomeSchedule, removeIncomeSchedule } = useApp();
   const [label, setLabel] = useState('');
   const [amount, setAmount] = useState('');
@@ -75,7 +70,7 @@ function IncomeScheduleManager() {
               <span className="schedule-dot" />
               <span className="schedule-label">{s.label}</span>
               <span className="schedule-day text-muted">on the {ordinal(s.dayOfMonth)}</span>
-              <span className="schedule-amount">{fmtAmount(s.amount)}</span>
+              <span className="schedule-amount">{fmt(s.amount)}</span>
               <button
                 className="icon-btn icon-btn--danger"
                 onClick={() => removeIncomeSchedule(s.id)}
@@ -110,7 +105,7 @@ function IncomeScheduleManager() {
           <div className="form-field">
             <label className="form-label">Amount</label>
             <div className="input-prefix-wrap">
-              <span className="input-prefix">€</span>
+              <span className="input-prefix">{currencySymbol}</span>
               <input
                 className="form-input input-with-prefix"
                 type="number"
@@ -147,7 +142,7 @@ function IncomeScheduleManager() {
 }
 
 export default function Settings() {
-  const { user, settings, logout, updateSettings } = useApp();
+  const { user, settings, logout, updateSettings, fmt, currency, setCurrency, currencySymbol } = useApp();
   const navigate = useNavigate();
 
   const [name, setName] = useState(user?.name || '');
@@ -260,7 +255,7 @@ export default function Settings() {
             <div className="form-field">
               <label className="form-label">Monthly salary</label>
               <div className="input-prefix-wrap">
-                <span className="input-prefix">€</span>
+                <span className="input-prefix">{currencySymbol}</span>
                 <input
                   className="form-input input-with-prefix"
                   type="number"
@@ -276,7 +271,7 @@ export default function Settings() {
                 <div className="form-field">
                   <label className="form-label">Hourly rate</label>
                   <div className="input-prefix-wrap">
-                    <span className="input-prefix">€</span>
+                    <span className="input-prefix">{currencySymbol}</span>
                     <input
                       className="form-input input-with-prefix"
                       type="number"
@@ -313,7 +308,24 @@ export default function Settings() {
       </Section>
 
       <Section title="Income Schedule">
-        <IncomeScheduleManager />
+        <IncomeScheduleManager fmt={fmt} currencySymbol={currencySymbol} />
+      </Section>
+
+      <Section title="Currency">
+        <div className="settings-fields">
+          <p className="settings-hint">Choose the currency used across the app.</p>
+          <div className="mode-toggle">
+            {[{ code: 'EUR', label: '€ Euro' }, { code: 'USD', label: '$ Dollar' }, { code: 'ZAR', label: 'R Rand' }].map(({ code, label }) => (
+              <button
+                key={code}
+                className={`mode-btn ${currency === code ? 'mode-btn--active' : ''}`}
+                onClick={() => setCurrency(code)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </Section>
 
       <Section title="Account">

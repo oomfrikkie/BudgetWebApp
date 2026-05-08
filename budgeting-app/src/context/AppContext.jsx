@@ -12,6 +12,14 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [currency, setCurrencyState] = useState(() => localStorage.getItem('currency') || 'EUR');
+
+  const CURRENCY_LOCALES = { EUR: 'de-DE', USD: 'en-US', ZAR: 'en-ZA' };
+  const CURRENCY_SYMBOLS = { EUR: '€', USD: '$', ZAR: 'R' };
+
+  const setCurrency = (c) => { localStorage.setItem('currency', c); setCurrencyState(c); };
+  const fmt = (n) => new Intl.NumberFormat(CURRENCY_LOCALES[currency] || 'en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(n);
+  const currencySymbol = CURRENCY_SYMBOLS[currency] || currency;
   // All onboarding data — set just before navigating to /auth
   // Shape: { salary: {estimatedSalary, hourlyRate?, hoursPerWeek?}, schedules: [...], budgets: {...} }
   const [pendingOnboarding, setPendingOnboarding] = useState(null);
@@ -217,6 +225,10 @@ export function AppProvider({ children }) {
         removeIncomeSchedule,
         updateIncomeSchedule,
         updateSettings,
+        currency,
+        setCurrency,
+        fmt,
+        currencySymbol,
         openAddModal: () => setShowAddModal(true),
         closeAddModal: () => setShowAddModal(false),
       }}

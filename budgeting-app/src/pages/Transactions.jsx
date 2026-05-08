@@ -4,11 +4,8 @@ import { CATEGORIES, getCategoryById } from '../data/categories';
 import { IconTrash, IconEdit, IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
 import AddTransactionModal from '../components/AddTransactionModal';
 
-const fmt = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-
 export default function Transactions() {
-  const { transactions, deleteTransaction, openAddModal } = useApp();
+  const { transactions, deleteTransaction, openAddModal, fmt } = useApp();
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [editTx, setEditTx] = useState(null);

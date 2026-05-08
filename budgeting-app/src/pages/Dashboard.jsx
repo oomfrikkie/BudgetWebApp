@@ -4,10 +4,6 @@ import { CATEGORIES, getCategoryById } from '../data/categories';
 import { IconArrowUp, IconArrowDown, IconPlus } from '../components/Icons';
 import WhatIfModal from '../components/WhatIfModal';
 
-const fmt = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-
-const fmtSigned = (n) => `${n >= 0 ? '+' : ''}${fmt(n)}`;
 
 function getMonthKey(dateStr) { return dateStr.slice(0, 7); }
 
@@ -39,7 +35,8 @@ const ordinal = (n) => {
 const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
 export default function Dashboard() {
-  const { transactions, budgets, settings, incomeSchedules, openAddModal, user } = useApp();
+  const { transactions, budgets, settings, incomeSchedules, openAddModal, user, fmt, currency, setCurrency } = useApp();
+  const fmtSigned = (n) => `${n >= 0 ? '+' : ''}${fmt(n)}`;
   const [showWhatIf, setShowWhatIf] = useState(false);
   const barChartRef = useRef(null);
 
@@ -119,7 +116,16 @@ export default function Dashboard() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-sub">{currentMonthDisplay}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="currency-toggle">
+            {['EUR', 'USD', 'ZAR'].map((c) => (
+              <button
+                key={c}
+                className={`currency-btn ${currency === c ? 'currency-btn--active' : ''}`}
+                onClick={() => setCurrency(c)}
+              >{c}</button>
+            ))}
+          </div>
           <button className="btn btn-ghost btn-sm" onClick={() => setShowWhatIf(true)}>
             What if?
           </button>

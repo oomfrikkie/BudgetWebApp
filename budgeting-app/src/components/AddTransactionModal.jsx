@@ -6,7 +6,7 @@ import { IconClose, IconArrowUp, IconArrowDown } from './Icons';
 const today = new Date().toISOString().split('T')[0];
 
 export default function AddTransactionModal({ editTx, onClose }) {
-  const { closeAddModal, addTransaction, updateTransaction } = useApp();
+  const { closeAddModal, addTransaction, updateTransaction, currencySymbol } = useApp();
   const close = onClose || closeAddModal;
   const isEdit = !!editTx;
 
@@ -92,7 +92,7 @@ export default function AddTransactionModal({ editTx, onClose }) {
           <div className="form-field">
             <label className="form-label">Amount</label>
             <div className="input-prefix-wrap">
-              <span className="input-prefix">€</span>
+              <span className="input-prefix">{currencySymbol}</span>
               <input
                 className={`form-input input-with-prefix ${errors.amount ? 'input-error' : ''}`}
                 type="number"

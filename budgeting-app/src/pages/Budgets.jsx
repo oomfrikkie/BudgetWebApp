@@ -3,9 +3,6 @@ import { useApp } from '../context/AppContext';
 import { CATEGORIES } from '../data/categories';
 import { IconEdit, IconCheck, IconClose } from '../components/Icons';
 
-const fmt = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-
 function getMonthKey(dateStr) {
   return dateStr.slice(0, 7);
 }
@@ -50,7 +47,7 @@ function EditableLimit({ limit, onSave }) {
 }
 
 export default function Budgets() {
-  const { transactions, budgets, updateBudget } = useApp();
+  const { transactions, budgets, updateBudget, fmt } = useApp();
   const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
 
   const spentByCategory = useMemo(() => {

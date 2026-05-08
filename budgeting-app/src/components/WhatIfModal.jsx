@@ -3,13 +3,10 @@ import { useApp } from '../context/AppContext';
 import { CATEGORIES, getCategoryById } from '../data/categories';
 import { IconClose } from './Icons';
 
-const fmt = (n) =>
-  new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-
 const CURRENT_MONTH = new Date().toISOString().slice(0, 7);
 
 export default function WhatIfModal({ onClose }) {
-  const { transactions, incomeSchedules, budgets } = useApp();
+  const { transactions, incomeSchedules, budgets, fmt } = useApp();
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('grocery');
 
