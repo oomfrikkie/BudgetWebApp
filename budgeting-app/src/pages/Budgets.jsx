@@ -9,7 +9,7 @@ function getMonthKey(dateStr) {
 
 const currentMonthDisplay = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-function EditableLimit({ limit, onSave }) {
+function EditableLimit({ limit, onSave, fmt }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(String(limit));
 
@@ -113,7 +113,7 @@ export default function Budgets() {
                       {fmt(spent)}
                     </span>
                     <span className="text-muted"> / </span>
-                    <EditableLimit limit={limit} onSave={(v) => updateBudget(cat.id, v)} />
+                    <EditableLimit limit={limit} onSave={(v) => updateBudget(cat.id, v)} fmt={fmt} />
                   </div>
                 </div>
               </div>
