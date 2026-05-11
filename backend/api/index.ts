@@ -12,7 +12,7 @@ let isReady = false;
 
 async function bootstrap() {
   if (isReady) return server;
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), { logger: false });
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

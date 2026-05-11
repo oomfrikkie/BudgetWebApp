@@ -30,6 +30,7 @@ import { IncomeSchedulesModule } from './modules/income-schedules/income-schedul
         migrations: ['dist/migrations/*.js'],
         synchronize: false,
         ssl: { rejectUnauthorized: false },
+        extra: { max: 2, idleTimeoutMillis: 10000, connectionTimeoutMillis: 5000 },
       }),
     }),
     AuthModule,
